@@ -46,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     if (confirmed == true) {
+      if (!mounted) return;
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.logoutUser();
     }
@@ -71,15 +72,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               if (nameController.text.trim().isEmpty) return;
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
               final authService = Provider.of<AuthService>(context, listen: false);
               await authService.updateUserProfile(currentUser!.uid, {'name': nameController.text.trim()});
               await currentUser!.updateDisplayName(nameController.text.trim());
-              Navigator.pop(context);
+              navigator.pop();
               await _loadUserProfile();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('✅ Profile updated!'), backgroundColor: Colors.green));
-              }
+              messenger.showSnackBar(
+                const SnackBar(content: Text('✅ Profile updated!'), backgroundColor: Colors.green));
             },
             child: const Text('Save'),
           ),

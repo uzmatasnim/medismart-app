@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── USERS ──────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── MEDICATIONS ────────────────────────────────────────
+    match /medications/{medId} {
+      // Anyone authenticated can read their own medications
+      allow read: if request.auth != null &&
+                     resource.data.patient_id == request.auth.uid;
+
+      // On create, resource.data is null — the incoming document is
+      // request.resource.data. Checking the wrong one denied every write.
+      allow create: if request.auth != null &&
+                       request.resource.data.patient_id == request.auth.uid;
+
+      // Owner only, and patient_id may never be reassigned.
+      allow update: if request.auth != null &&
+                       resource.data.patient_id == request.auth.uid &&
+                       request.resource.data.patient_id == resource.data.patient_id;
+
+      // No hard deletes - use soft delete (is_active=false)
+      allow delete: if false;
+    }
+
+    // ── ADHERENCE EVENTS ───────────────────────────────────
+    // Append-only immutable logs
+    match /adherence_events/{eventId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if false;  // IMMUTABLE
+      allow delete: if false;  // IMMUTABLE
+    }
+
+    // ── NOTIFICATION PREFERENCES ───────────────────────────
+    match /notification_preferences/{prefId} {
+      allow read, write: if request.auth != null &&
+                            request.auth.uid == prefId;
+    }
+
+    // ── CAREGIVER ASSIGNMENTS ──────────────────────────────
+    match /caregiver_assignments/{assignId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+
+    // ── SYSTEM SETTINGS ────────────────────────────────────
+    match /system_settings/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;  // Admin only in production
+    }
+  }
+}

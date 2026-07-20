@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="MediSmart - Your Personal Medication Reminder & Management App">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="MediSmart">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MediSmart</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #2196F3;
+    }
+    #loading {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #2196F3;
+      z-index: 9999;
+      font-family: 'Roboto', sans-serif;
+    }
+    #loading h1 { color: white; font-size: 32px; margin: 0 0 8px; }
+    #loading p  { color: rgba(255,255,255,0.8); font-size: 15px; margin: 0 0 30px; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <h1>💊 MediSmart</h1>
+    <p>Your Medication Companion</p>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Firebase Web SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwMpOvIhAgY4nEcfD-BxrEJ01n9jSGYOY",
+      authDomain: "medismart-app-ba167.firebaseapp.com",
+      projectId: "medismart-app-ba167",
+      storageBucket: "medismart-app-ba167.firebasestorage.app",
+      messagingSenderId: "671467188008",
+      appId: "1:671467188008:web:medismart_web"
+    };
+
+    window.firebaseConfig = firebaseConfig;
+    initializeApp(firebaseConfig);
+  </script>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.opacity = '0';
+        loading.style.transition = 'opacity 0.5s ease';
+        setTimeout(function() { loading.style.display = 'none'; }, 500);
+      }
+    });
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
